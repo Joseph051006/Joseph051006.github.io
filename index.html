@@ -1,67 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maps Leaflet</title>
-     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
-     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
-     <style>
-        #map { height: 1000px; 
-        
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        #map {
+            height: 1000px;
+
         }
-     </style>
+    </style>
 
 </head>
+
 <body>
     <div id="map"></div>
     <script>
+        
+        getPosition()
+
+        let latlngs = [];
         const map = L.map('map');
-        const tileUrl = 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg'
+        const tileUrl = 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg';
         const tileLayer = new L.tileLayer(tileUrl);
 
-        map.addLayer(tileLayer);
-        map.setView(L.latLng(46.294791, 7.87771675), 16);
+        function getPosition() {
+            console.log("getPosition")
+            navigator.geolocation.watchPosition(position => {
+                console.log(position)
+                latlngs += [position.coords.latitude,  position.coords.longitude]
+                document.getElementById("ps").innerHTML += `<p>${position.coords.latitude}, ${position.coords.longitude}</p>`
+                new L.circle(L.latLng(position.coords.latitude,  position.coords.longitude), {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: 50
+                }).addTo(map);
 
-        const circle = L.circle([46.294791, 7.87771675], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 50
-        }).addTo(map);
+            }, error => {
+                console.error(error)
+            })
 
-    function getPosition() {
-        navigator.geolocation.getCurrentPosition(position => {
-            console.log(position)
-            document.body.innerHTML += `<p>${position.coords.latitude}, ${position.coords.longitude}</p>`
-        }, error => {
-            console.error(error)
         }
-    )
-    }
-
-    function success(pos){
-        const crd = pos.coords;
-    }
 
 
-
-        let id = navigator.geolocation.watchPosition(success)
-        console.log(id)
-    
-    
-
-
-
+        map.addLayer(tileLayer);
+        map.setView(L.latLng(46, 7.8), 16);
+        L.polyline(latlngs, {color: 'red'}).addTo(map);
 
     </script>
 
-    <button onclick="getPosition()"></button>
-    
-    
+   
+
+    <div id="ps"></div>
 </body>
+
 </html>
